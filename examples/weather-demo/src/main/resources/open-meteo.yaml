@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: Open-Meteo (trimmed)
+  version: 1.0.0
+paths:
+  /v1/forecast:
+    get:
+      operationId: getCurrentWeather
+      summary: Get the current weather at a geographic coordinate
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          description: Latitude in WGS84 decimal degrees (e.g. 52.52 for Berlin)
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: true
+          description: Longitude in WGS84 decimal degrees (e.g. 13.41 for Berlin)
+          schema:
+            type: number
+        - name: current
+          in: query
+          required: true
+          description: >-
+            Comma-separated list of current-weather variables to return, e.g.
+            "temperature_2m" or "temperature_2m,wind_speed_10m,relative_humidity_2m".
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok

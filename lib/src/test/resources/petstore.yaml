@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Petstore (trimmed)
+  version: 1.0.0
+paths:
+  /pet/{petId}:
+    get:
+      operationId: getPetById
+      summary: Find pet by ID
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: ok
+  /pet/findByStatus:
+    get:
+      operationId: findPetsByStatus
+      summary: Finds pets by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - available
+                - pending
+                - sold
+      responses:
+        '200':
+          description: ok
+  /pet:
+    post:
+      operationId: addPet
+      summary: Add a new pet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Pet name
+                status:
+                  type: string
+                  enum:
+                    - available
+                    - pending
+                    - sold
+      responses:
+        '200':
+          description: ok
