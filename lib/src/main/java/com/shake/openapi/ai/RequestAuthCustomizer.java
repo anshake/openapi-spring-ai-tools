@@ -3,9 +3,11 @@ package com.shake.openapi.ai;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.support.HttpRequestWrapper;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 /**
@@ -45,16 +47,20 @@ public interface RequestAuthCustomizer
 
     static RequestAuthCustomizer apiKeyQuery(String paramName, Supplier<String> key)
     {
-        return request -> new HttpRequestWrapper(request)
+        return request ->
         {
-            @Override
-            public URI getURI()
+            var resolvedKey = UriUtils.encode(key.get(), StandardCharsets.UTF_8);
+            return new HttpRequestWrapper(request)
             {
-                return UriComponentsBuilder.fromUri(super.getURI())
-                                           .queryParam(paramName, key.get())
-                                           .build(true)
-                                           .toUri();
-            }
+                @Override
+                public URI getURI()
+                {
+                    return UriComponentsBuilder.fromUri(super.getURI())
+                                               .queryParam(paramName, resolvedKey)
+                                               .build(true)
+                                               .toUri();
+                }
+            };
         };
     }
 }

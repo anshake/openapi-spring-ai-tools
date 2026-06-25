@@ -115,4 +115,25 @@ class OperationExecutorTest {
 
         authServer.verify();
     }
+
+    @Test
+    void appliesApiKeyHeader() {
+        var authBuilder = RestClient.builder().baseUrl("http://localhost");
+        var authServer = MockRestServiceServer.bindTo(authBuilder).build();
+        OperationExecutor.applyAuth(authBuilder, RequestAuthCustomizer.apiKey("X-Api-Key", () -> "key-123"));
+        var authExecutor = new OperationExecutor(authBuilder.build());
+
+        authServer.expect(requestTo("http://localhost/pet/42"))
+                .andExpect(method(GET))
+                .andExpect(header("X-Api-Key", "key-123"))
+                .andRespond(withSuccess("{\"id\":42}", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "getPetById", "Find pet by ID", GET, "/pet/{petId}",
+                List.of(new OpenApiParameter("petId", ParameterLocation.PATH, true)), "{}");
+
+        authExecutor.execute(operation, "{\"petId\":42}");
+
+        authServer.verify();
+    }
 }

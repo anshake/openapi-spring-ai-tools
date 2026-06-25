@@ -6,6 +6,8 @@ import com.shake.openapi.ai.parser.OpenApiSpecParser;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
+import java.util.Objects;
+
 /**
  * Public entry point: reads an OpenAPI 3 spec and exposes each operation as a
  * Spring AI {@link ToolCallback}, grouped into a {@link ToolCallbackProvider}.
@@ -54,7 +56,7 @@ public final class OpenApiToolBundle
      */
     public OpenApiToolBundle auth(RequestAuthCustomizer auth)
     {
-        this.auth = auth;
+        this.auth = Objects.requireNonNull(auth, "auth must not be null");
         return this;
     }
 
