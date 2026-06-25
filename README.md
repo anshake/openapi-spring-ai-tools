@@ -64,6 +64,38 @@ String answer = chatClient
         .content();
 ```
 
+### Authentication
+
+For secured APIs, set a `RequestAuthCustomizer` with `.auth(...)`. It is applied to every
+request, and credentials are read through a `Supplier` at request time, so rotated keys or
+refreshed tokens are picked up automatically:
+
+```java
+OpenApiToolBundle
+        .from("classpath:open-meteo.yaml")
+        .baseUrl("https://api.example.com")
+        .auth(RequestAuthCustomizer.bearer(() -> tokenStore.current()))
+        .build();
+```
+
+Predefined customizers:
+
+```java
+RequestAuthCustomizer.bearer(() -> token)                  // Authorization: Bearer <token>
+RequestAuthCustomizer.apiKey("X-Api-Key", () -> key)       // header
+RequestAuthCustomizer.apiKeyQuery("api_key", () -> key)    // ?api_key=<key> in the URL
+```
+
+For anything else, implement the interface — mutate the request's headers (or URI) and
+return it:
+
+```java
+.auth(request -> {
+    request.getHeaders().set("X-Custom", customSupplier.get());
+    return request;
+})
+```
+
 ## Write Good Descriptions
 
 The model decides which tool to call. It decides from the descriptions in
@@ -92,16 +124,14 @@ arguments. Spend your time here first.
 ## Scope (Phase 1)
 
 **Supported:** GET/POST/PUT/PATCH/DELETE operations; path, query, and JSON request bodies;
-specs loaded from classpath, file, or URL.
+specs loaded from classpath, file, or URL; authentication via `RequestAuthCustomizer`
+(bearer, API key header, API key query param, or custom).
 
-**Not yet supported:** Spring Boot autoconfiguration, authentication / header injection,
-operation filtering, and request bodies beyond `application/json`. HTTP errors are thrown
-as runtime exceptions.
+**Not yet supported:** Spring Boot autoconfiguration, operation filtering, and request
+bodies beyond `application/json`. HTTP errors are thrown as runtime exceptions.
 
 ## Next Steps
 
-- **Authentication.** Inject API keys, bearer tokens, or custom headers so the tools can
-  call secured endpoints.
 - **Overlay support.** Add or improve descriptions without editing the original spec. This helps most with a third-party
   API whose spec has poor descriptions: you can't fix it at the source, but the model relies
   on those descriptions, so you add the missing context on your side.
