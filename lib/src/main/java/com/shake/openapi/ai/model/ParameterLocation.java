@@ -5,7 +5,8 @@ package com.shake.openapi.ai.model;
  * two locations the executor routes on; header and cookie parameters are filtered
  * out by the parser.
  */
-public enum ParameterLocation {
+public enum ParameterLocation
+{
 
     PATH,
     QUERY;
@@ -15,8 +16,10 @@ public enum ParameterLocation {
      *
      * @throws IllegalArgumentException for anything other than {@code "path"} or {@code "query"}
      */
-    public static ParameterLocation from(String in) {
-        return switch (in) {
+    public static ParameterLocation from(String in)
+    {
+        return switch (in)
+        {
             case "path" -> PATH;
             case "query" -> QUERY;
             default -> throw new IllegalArgumentException("Unsupported parameter location: " + in);

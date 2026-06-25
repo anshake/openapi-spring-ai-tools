@@ -22,5 +22,6 @@ public record OpenApiOperation(
         HttpMethod httpMethod,
         String pathTemplate,
         List<OpenApiParameter> parameters,
-        String inputSchema) {
+        String inputSchema)
+{
 }
