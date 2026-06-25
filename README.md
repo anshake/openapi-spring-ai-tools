@@ -102,8 +102,7 @@ as runtime exceptions.
 
 - **Authentication.** Inject API keys, bearer tokens, or custom headers so the tools can
   call secured endpoints.
-- **[OpenAPI Overlay](https://spec.openapis.org/overlay/latest.html) support.** Add or
-  improve descriptions without editing the original spec. This helps most with a third-party
+- **Overlay support.** Add or improve descriptions without editing the original spec. This helps most with a third-party
   API whose spec has poor descriptions: you can't fix it at the source, but the model relies
   on those descriptions, so you add the missing context on your side.
 
@@ -111,4 +110,3 @@ as runtime exceptions.
 
 - [Spring AI reference documentation](https://docs.spring.io/spring-ai/reference/)
 - [OpenAPI 3 specification](https://spec.openapis.org/oas/latest.html)
-- [OpenAPI Overlay specification](https://spec.openapis.org/overlay/latest.html)
