@@ -38,6 +38,15 @@ class RequestAuthCustomizerTest {
     }
 
     @Test
+    void apiKeyQueryEncodesSpecialCharacters() throws Exception {
+        var request = new MockClientHttpRequest(HttpMethod.GET, URI.create("http://localhost/pets"));
+
+        var result = RequestAuthCustomizer.apiKeyQuery("api_key", () -> "key+with=special&chars").apply(request);
+
+        assertThat(result.getURI()).hasToString("http://localhost/pets?api_key=key%2Bwith%3Dspecial%26chars");
+    }
+
+    @Test
     void credentialIsResolvedAtRequestTime() throws Exception {
         var token = new String[]{"first"};
         var customizer = RequestAuthCustomizer.bearer(() -> token[0]);
