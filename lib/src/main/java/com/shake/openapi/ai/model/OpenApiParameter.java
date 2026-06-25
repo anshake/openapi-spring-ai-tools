@@ -8,5 +8,6 @@ package com.shake.openapi.ai.model;
  * @param in       where the parameter goes in the request
  * @param required whether the spec marks it mandatory
  */
-public record OpenApiParameter(String name, ParameterLocation in, boolean required) {
+public record OpenApiParameter(String name, ParameterLocation in, boolean required)
+{
 }

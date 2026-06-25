@@ -19,12 +19,15 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  * ChatClient.builder(chatModel).defaultTools(tools).build();
  * }</pre>
  */
-public final class OpenApiToolBundle {
+public final class OpenApiToolBundle
+{
 
     private final String specLocation;
     private String baseUrl;
+    private RequestAuthCustomizer auth;
 
-    private OpenApiToolBundle(String specLocation) {
+    private OpenApiToolBundle(String specLocation)
+    {
         this.specLocation = specLocation;
     }
 
@@ -32,24 +35,36 @@ public final class OpenApiToolBundle {
      * @param specLocation a Spring resource location: {@code classpath:}, {@code file:},
      *                     or {@code http(s):}
      */
-    public static OpenApiToolBundle from(String specLocation) {
+    public static OpenApiToolBundle from(String specLocation)
+    {
         return new OpenApiToolBundle(specLocation);
     }
 
     /**
      * Base URL the operation paths are resolved against.
      */
-    public OpenApiToolBundle baseUrl(String baseUrl) {
+    public OpenApiToolBundle baseUrl(String baseUrl)
+    {
         this.baseUrl = baseUrl;
         return this;
     }
 
-    public ToolCallbackProvider build() {
+    /**
+     * Authentication applied before every request. Optional; last-one-wins.
+     */
+    public OpenApiToolBundle auth(RequestAuthCustomizer auth)
+    {
+        this.auth = auth;
+        return this;
+    }
+
+    public ToolCallbackProvider build()
+    {
         var operations = new OpenApiSpecParser().parse(specLocation);
-        var executor = new OperationExecutor(baseUrl);
+        var executor = new OperationExecutor(baseUrl, auth);
         var callbacks = operations.stream()
-                .map(operation -> new OpenApiToolCallback(operation, executor))
-                .toList();
+                                  .map(operation -> new OpenApiToolCallback(operation, executor))
+                                  .toList();
         return ToolCallbackProvider.from(callbacks);
     }
 }

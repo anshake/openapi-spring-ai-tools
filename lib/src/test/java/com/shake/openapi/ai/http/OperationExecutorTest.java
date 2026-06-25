@@ -1,5 +1,6 @@
 package com.shake.openapi.ai.http;
 
+import com.shake.openapi.ai.RequestAuthCustomizer;
 import com.shake.openapi.ai.model.OpenApiOperation;
 import com.shake.openapi.ai.model.OpenApiParameter;
 import com.shake.openapi.ai.model.ParameterLocation;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -71,5 +73,46 @@ class OperationExecutorTest {
         executor.execute(operation, "{\"name\":\"Rex\",\"status\":\"available\"}");
 
         server.verify();
+    }
+
+    @Test
+    void appendsApiKeyAsQueryParameter() {
+        var authBuilder = RestClient.builder().baseUrl("http://localhost");
+        var authServer = MockRestServiceServer.bindTo(authBuilder).build();
+        OperationExecutor.applyAuth(authBuilder, RequestAuthCustomizer.apiKeyQuery("api_key", () -> "secret"));
+        var authExecutor = new OperationExecutor(authBuilder.build());
+
+        authServer.expect(requestTo("http://localhost/pet/findByStatus?status=available&api_key=secret"))
+                .andExpect(method(GET))
+                .andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "findPetsByStatus", "Finds pets by status", GET, "/pet/findByStatus",
+                List.of(new OpenApiParameter("status", ParameterLocation.QUERY, false)), "{}");
+
+        authExecutor.execute(operation, "{\"status\":\"available\"}");
+
+        authServer.verify();
+    }
+
+    @Test
+    void appliesBearerTokenHeader() {
+        var authBuilder = RestClient.builder().baseUrl("http://localhost");
+        var authServer = MockRestServiceServer.bindTo(authBuilder).build();
+        OperationExecutor.applyAuth(authBuilder, RequestAuthCustomizer.bearer(() -> "token-123"));
+        var authExecutor = new OperationExecutor(authBuilder.build());
+
+        authServer.expect(requestTo("http://localhost/pet/42"))
+                .andExpect(method(GET))
+                .andExpect(header("Authorization", "Bearer token-123"))
+                .andRespond(withSuccess("{\"id\":42}", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "getPetById", "Find pet by ID", GET, "/pet/{petId}",
+                List.of(new OpenApiParameter("petId", ParameterLocation.PATH, true)), "{}");
+
+        authExecutor.execute(operation, "{\"petId\":42}");
+
+        authServer.verify();
     }
 }
