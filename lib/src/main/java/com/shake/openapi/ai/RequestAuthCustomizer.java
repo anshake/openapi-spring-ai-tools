@@ -8,8 +8,9 @@ import org.springframework.web.util.UriUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.function.Supplier;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Applies authentication to a request before it is sent. Optional per bundle —
@@ -30,7 +31,7 @@ public interface RequestAuthCustomizer
 
     static RequestAuthCustomizer bearer(Supplier<String> token)
     {
-        Objects.requireNonNull(token, "token supplier must not be null");
+        requireNonNull(token, "token supplier must not be null");
         return request ->
         {
             request.getHeaders().setBearerAuth(token.get());
@@ -40,8 +41,8 @@ public interface RequestAuthCustomizer
 
     static RequestAuthCustomizer apiKey(String headerName, Supplier<String> key)
     {
-        Objects.requireNonNull(headerName, "headerName must not be null");
-        Objects.requireNonNull(key, "key supplier must not be null");
+        requireNonNull(headerName, "headerName must not be null");
+        requireNonNull(key, "key supplier must not be null");
         return request ->
         {
             request.getHeaders().set(headerName, key.get());
@@ -51,8 +52,8 @@ public interface RequestAuthCustomizer
 
     static RequestAuthCustomizer apiKeyQuery(String paramName, Supplier<String> key)
     {
-        Objects.requireNonNull(paramName, "paramName must not be null");
-        Objects.requireNonNull(key, "key supplier must not be null");
+        requireNonNull(paramName, "paramName must not be null");
+        requireNonNull(key, "key supplier must not be null");
         return request ->
         {
             var resolvedKey = UriUtils.encode(key.get(), StandardCharsets.UTF_8);
