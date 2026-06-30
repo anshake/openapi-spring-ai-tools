@@ -3,6 +3,8 @@ package com.shake.openapi.ai.http;
 import com.shake.openapi.ai.RequestAuthCustomizer;
 import com.shake.openapi.ai.model.OpenApiOperation;
 import com.shake.openapi.ai.model.ParameterLocation;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
@@ -28,6 +30,8 @@ import java.util.HashSet;
  */
 public class OperationExecutor
 {
+
+    private static final Log log = LogFactory.getLog(OperationExecutor.class);
 
     private final RestClient restClient;
     private final JsonMapper json = new JsonMapper();
@@ -99,13 +103,16 @@ public class OperationExecutor
                                 .uri(uriBuilder -> {
                                     uriBuilder.path(operation.pathTemplate());
                                     queryParams.forEach((name, value) -> appendQueryParam(uriBuilder, name, value));
-                                    return uriBuilder.build(pathVariables);
+                                    var uri = uriBuilder.build(pathVariables);
+                                    log.debug("[" + operation.operationId() + "] Calling " + method + " " + uri);
+                                    return uri;
                                 });
 
         if (sendsBody && !body.isEmpty())
         {
             request = request.contentType(MediaType.APPLICATION_JSON).body(json.writeValueAsString(body));
         }
+
 
         return request.retrieve().body(String.class);
     }
