@@ -20,4 +20,4 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file lib/pom.xml -P test --no-transfer-progress
+      run: mvn -B package -P test --no-transfer-progress
