@@ -77,7 +77,7 @@ jobs:
 
       - name: Set next development version
         run: |
-          mvn build-helper:parse-version versions:set \
+          mvn org.codehaus.mojo:build-helper-maven-plugin:3.6.1:parse-version versions:set \
             -DnewVersion='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}-SNAPSHOT' \
             -DgenerateBackupPoms=false
 
