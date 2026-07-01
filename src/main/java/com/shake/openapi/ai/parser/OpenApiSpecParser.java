@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Reads an OpenAPI 3 spec from a Spring resource location ({@code classpath:},
@@ -78,9 +79,10 @@ public class OpenApiSpecParser
      * {@link PathItem} instead of repeated per operation; an operation-level parameter
      * with the same {@code name}/{@code in} overrides the path-level one. Merging this
      * here (rather than only reading {@code operation.getParameters()}) is also what lets
-     * {@link OverlayApplier} find such a parameter to override its description.
+     * {@link OverlayApplier} look one up by its {@code in:name} key to override its
+     * description.
      */
-    static List<Parameter> mergedParameters(PathItem pathItem, Operation operation)
+    static Map<String, Parameter> mergedParameters(PathItem pathItem, Operation operation)
     {
         var merged = new LinkedHashMap<String, Parameter>();
         if (pathItem.getParameters() != null)
@@ -91,7 +93,7 @@ public class OpenApiSpecParser
         {
             operation.getParameters().forEach(p -> merged.put(p.getIn() + ":" + p.getName(), p));
         }
-        return List.copyOf(merged.values());
+        return merged;
     }
 
     private OpenAPI readSpec(String specLocation)
@@ -148,7 +150,7 @@ public class OpenApiSpecParser
 
     private List<Parameter> pathAndQueryParameters(PathItem pathItem, Operation operation)
     {
-        return mergedParameters(pathItem, operation).stream()
+        return mergedParameters(pathItem, operation).values().stream()
                                                      .filter(p -> "path".equals(p.getIn()) || "query".equals(p.getIn()))
                                                      .toList();
     }

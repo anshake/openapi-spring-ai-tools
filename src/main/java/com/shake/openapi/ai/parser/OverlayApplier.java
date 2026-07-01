@@ -12,7 +12,7 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Merges an overlay document's endpoint/parameter {@code summary} and
@@ -106,7 +106,7 @@ class OverlayApplier
         }
     }
 
-    private void applyParameter(List<Parameter> parameters, String pathTemplate, String methodName,
+    private void applyParameter(Map<String, Parameter> parameters, String pathTemplate, String methodName,
                                 JsonNode overlayParameter)
     {
         if (!overlayParameter.has(NAME))
@@ -124,10 +124,7 @@ class OverlayApplier
 
         var name = overlayParameter.get(NAME).asText();
         var in = overlayParameter.get(IN).asText();
-        var parameter = parameters.stream()
-                                  .filter(p -> p.getName().equals(name) && p.getIn().equals(in))
-                                  .findFirst()
-                                  .orElse(null);
+        var parameter = parameters.get(in + ":" + name);
         if (parameter == null)
         {
             throw new IllegalArgumentException(
