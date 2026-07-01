@@ -1,5 +1,11 @@
 name: Release
 
+# Release is not atomic: the "Release X" commit and tag are pushed before the
+# GitHub Release is created and before the next -SNAPSHOT is committed. If a run
+# fails after the tag is pushed, main is left on the release version. To recover:
+#   1. delete the tag if it was pushed:  git push --delete origin vX.Y.Z
+#   2. reset main back to before the "Release X" commit and force-push
+#   3. re-run this workflow
 on:
   workflow_dispatch:
     inputs:
@@ -7,13 +13,33 @@ on:
         description: 'Release version (e.g. 0.2.0)'
         required: true
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      RELEASE_VERSION: ${{ github.event.inputs.version }}
 
     steps:
+      - name: Ensure running on main
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "Release must be run from main, got $GITHUB_REF"
+            exit 1
+          fi
+
+      - name: Validate version
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version '$RELEASE_VERSION' (expected X.Y.Z)"
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -30,23 +56,23 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
       - name: Set release version
-        run: mvn versions:set -DnewVersion=${{ github.event.inputs.version }} -DgenerateBackupPoms=false
+        run: mvn versions:set -DnewVersion="$RELEASE_VERSION" -DgenerateBackupPoms=false
 
       - name: Build and test
         run: mvn clean verify -Dgpg.skip=true
 
       - name: Commit and tag release
         run: |
-          git commit -am "Release ${{ github.event.inputs.version }}"
-          git tag -a "v${{ github.event.inputs.version }}" -m "Release ${{ github.event.inputs.version }}"
+          git commit -am "Release $RELEASE_VERSION"
+          git tag -a "v$RELEASE_VERSION" -m "Release $RELEASE_VERSION"
           git push --follow-tags
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: v${{ github.event.inputs.version }}
-          files: target/openapi-spring-ai-tools-${{ github.event.inputs.version }}.jar
+          tag_name: v${{ env.RELEASE_VERSION }}
+          name: v${{ env.RELEASE_VERSION }}
+          files: target/openapi-spring-ai-tools-${{ env.RELEASE_VERSION }}.jar
           generate_release_notes: true
 
       - name: Set next development version
