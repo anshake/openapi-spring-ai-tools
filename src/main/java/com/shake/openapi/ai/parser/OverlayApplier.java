@@ -85,8 +85,21 @@ class OverlayApplier
     private void applyParameter(List<Parameter> parameters, String pathTemplate, String methodName,
                                 JsonNode overlayParameter)
     {
-        var name = overlayParameter.path(NAME).asText(null);
-        var in = overlayParameter.path(IN).asText(null);
+        if (!overlayParameter.has(NAME))
+        {
+            throw new IllegalArgumentException(
+                    "Overlay parameter entry on " + methodName + " " + pathTemplate + " is missing required field '"
+                            + NAME + "'");
+        }
+        if (!overlayParameter.has(IN))
+        {
+            throw new IllegalArgumentException(
+                    "Overlay parameter entry on " + methodName + " " + pathTemplate + " is missing required field '"
+                            + IN + "'");
+        }
+
+        var name = overlayParameter.get(NAME).asText();
+        var in = overlayParameter.get(IN).asText();
         var parameter = parameters == null
                 ? null
                 : parameters.stream()

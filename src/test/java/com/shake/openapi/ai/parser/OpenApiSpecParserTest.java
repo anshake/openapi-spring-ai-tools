@@ -113,6 +113,38 @@ class OpenApiSpecParserTest {
     }
 
     @Test
+    void overlayParameterMissingNameThrows() {
+        var overlayLocation = writeOverlay("""
+                paths:
+                  /pet/{petId}:
+                    get:
+                      parameters:
+                        - in: path
+                          description: nope
+                """);
+
+        assertThatThrownBy(() -> parser.parse("classpath:petstore.yaml", overlayLocation))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("missing required field 'name'");
+    }
+
+    @Test
+    void overlayParameterMissingInThrows() {
+        var overlayLocation = writeOverlay("""
+                paths:
+                  /pet/{petId}:
+                    get:
+                      parameters:
+                        - name: petId
+                          description: nope
+                """);
+
+        assertThatThrownBy(() -> parser.parse("classpath:petstore.yaml", overlayLocation))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("missing required field 'in'");
+    }
+
+    @Test
     void overlayReferencingUnknownParameterThrows() {
         var overlayLocation = writeOverlay("""
                 paths:
