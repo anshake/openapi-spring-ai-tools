@@ -40,7 +40,7 @@ public final class OpenApiToolBundle
      */
     public static OpenApiToolBundle from(String specLocation)
     {
-        return new OpenApiToolBundle(specLocation);
+        return new OpenApiToolBundle(Objects.requireNonNull(specLocation, "specLocation must not be null"));
     }
 
     /**
@@ -50,7 +50,7 @@ public final class OpenApiToolBundle
      */
     public OpenApiToolBundle overlay(String overlayLocation)
     {
-        this.overlayLocation = overlayLocation;
+        this.overlayLocation = Objects.requireNonNull(overlayLocation, "overlayLocation must not be null");
         return this;
     }
 
