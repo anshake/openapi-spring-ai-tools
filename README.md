@@ -96,6 +96,38 @@ return it:
 })
 ```
 
+### Overlay
+
+Some specs — especially third-party ones — have poor or missing `summary`/`description`
+fields, which makes the model pick the wrong tool or the wrong parameter. If you can't fix
+the spec at the source, layer an overlay on top of it with `.overlay(...)`:
+
+```java
+OpenApiToolBundle
+        .from("classpath:open-meteo.yaml")
+        .overlay("classpath:open-meteo-overlay.yaml")   // also accepts file: or http(s): locations
+        .baseUrl("https://api.open-meteo.com")
+        .build();
+```
+
+The overlay is optional and only needs the part of the OpenAPI shape it overrides —
+matching `paths.<path>.<method>.summary` / `.description`, and `.parameters[]` matched by
+`name` + `in`:
+
+```yaml
+paths:
+  /v1/forecast:
+    get:
+      summary: Get the hourly and daily weather forecast for a location
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude in decimal degrees, -90 to 90
+```
+
+Every path, method, and parameter the overlay references must exist in the target spec —
+a typo throws rather than being silently ignored.
+
 ## Write Good Descriptions
 
 The model decides which tool to call. It decides from the descriptions in
@@ -125,16 +157,11 @@ arguments. Spend your time here first.
 
 **Supported:** GET/POST/PUT/PATCH/DELETE operations; path, query, and JSON request bodies;
 specs loaded from classpath, file, or URL; authentication via `RequestAuthCustomizer`
-(bearer, API key header, API key query param, or custom).
+(bearer, API key header, API key query param, or custom); overlaying summary/description
+fields onto the spec via `.overlay(...)`.
 
 **Not yet supported:** Spring Boot autoconfiguration, operation filtering, and request
 bodies beyond `application/json`. HTTP errors are thrown as runtime exceptions.
-
-## Next Steps
-
-- **Overlay support.** Add or improve descriptions without editing the original spec. This helps most with a third-party
-  API whose spec has poor descriptions: you can't fix it at the source, but the model relies
-  on those descriptions, so you add the missing context on your side.
 
 ## References
 
