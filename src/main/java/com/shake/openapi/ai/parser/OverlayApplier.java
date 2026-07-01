@@ -96,9 +96,10 @@ class OverlayApplier
 
         if (overlayOperation.has(PARAMETERS))
         {
+            var parameters = OpenApiSpecParser.mergedParameters(pathItem, operation);
             for (var overlayParameter : overlayOperation.get(PARAMETERS))
             {
-                applyParameter(operation.getParameters(), pathTemplate, methodName, overlayParameter);
+                applyParameter(parameters, pathTemplate, methodName, overlayParameter);
             }
         }
     }
@@ -121,12 +122,10 @@ class OverlayApplier
 
         var name = overlayParameter.get(NAME).asText();
         var in = overlayParameter.get(IN).asText();
-        var parameter = parameters == null
-                ? null
-                : parameters.stream()
-                            .filter(p -> p.getName().equals(name) && p.getIn().equals(in))
-                            .findFirst()
-                            .orElse(null);
+        var parameter = parameters.stream()
+                                  .filter(p -> p.getName().equals(name) && p.getIn().equals(in))
+                                  .findFirst()
+                                  .orElse(null);
         if (parameter == null)
         {
             throw new IllegalArgumentException(

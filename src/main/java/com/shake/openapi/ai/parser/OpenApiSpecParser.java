@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -66,9 +67,31 @@ public class OpenApiSpecParser
                                                                                         operations.add(
                                                                                                 toOperation(method,
                                                                                                             pathTemplate,
+                                                                                                            pathItem,
                                                                                                             operation,
                                                                                                             schemaMapper))));
         return operations;
+    }
+
+    /**
+     * Parameters shared across an operation's methods can be declared once on the
+     * {@link PathItem} instead of repeated per operation; an operation-level parameter
+     * with the same {@code name}/{@code in} overrides the path-level one. Merging this
+     * here (rather than only reading {@code operation.getParameters()}) is also what lets
+     * {@link OverlayApplier} find such a parameter to override its description.
+     */
+    static List<Parameter> mergedParameters(PathItem pathItem, Operation operation)
+    {
+        var merged = new LinkedHashMap<String, Parameter>();
+        if (pathItem.getParameters() != null)
+        {
+            pathItem.getParameters().forEach(p -> merged.put(p.getIn() + ":" + p.getName(), p));
+        }
+        if (operation.getParameters() != null)
+        {
+            operation.getParameters().forEach(p -> merged.put(p.getIn() + ":" + p.getName(), p));
+        }
+        return List.copyOf(merged.values());
     }
 
     private OpenAPI readSpec(String specLocation)
@@ -97,10 +120,10 @@ public class OpenApiSpecParser
         return result.getOpenAPI();
     }
 
-    private OpenApiOperation toOperation(PathItem.HttpMethod method, String pathTemplate, Operation operation,
-                                         ObjectMapper schemaMapper)
+    private OpenApiOperation toOperation(PathItem.HttpMethod method, String pathTemplate, PathItem pathItem,
+                                         Operation operation, ObjectMapper schemaMapper)
     {
-        var swaggerParameters = pathAndQueryParameters(operation);
+        var swaggerParameters = pathAndQueryParameters(pathItem, operation);
         var bodySchema = jsonBodySchema(operation.getRequestBody());
         var bodyRequired = operation.getRequestBody() != null
                 && Boolean.TRUE.equals(operation.getRequestBody().getRequired());
@@ -123,15 +146,11 @@ public class OpenApiSpecParser
                 operationId, summary, HttpMethod.valueOf(method.name()), pathTemplate, parameters, inputSchema);
     }
 
-    private List<Parameter> pathAndQueryParameters(Operation operation)
+    private List<Parameter> pathAndQueryParameters(PathItem pathItem, Operation operation)
     {
-        if (operation.getParameters() == null)
-        {
-            return List.of();
-        }
-        return operation.getParameters().stream()
-                        .filter(p -> "path".equals(p.getIn()) || "query".equals(p.getIn()))
-                        .toList();
+        return mergedParameters(pathItem, operation).stream()
+                                                     .filter(p -> "path".equals(p.getIn()) || "query".equals(p.getIn()))
+                                                     .toList();
     }
 
     private Schema<?> jsonBodySchema(RequestBody requestBody)

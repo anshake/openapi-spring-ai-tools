@@ -76,6 +76,41 @@ class OpenApiSpecParserTest {
     }
 
     @Test
+    void capturesPathLevelSharedParameter() {
+        var operations = parser.parse("classpath:path-level-parameter.yaml");
+        var getWidget = operations.stream()
+                .filter(op -> op.operationId().equals("getWidget"))
+                .findFirst()
+                .orElseThrow();
+
+        var widgetId = getWidget.parameters().getFirst();
+        assertThat(widgetId.name()).isEqualTo("widgetId");
+        assertThat(widgetId.in()).isEqualTo(ParameterLocation.PATH);
+        assertThat(widgetId.required()).isTrue();
+    }
+
+    @Test
+    void overlayOverridesPathLevelSharedParameterDescription() {
+        var overlayLocation = writeOverlay("""
+                paths:
+                  /widgets/{widgetId}:
+                    get:
+                      parameters:
+                        - name: widgetId
+                          in: path
+                          description: The widget's numeric ID.
+                """);
+
+        var operations = parser.parse("classpath:path-level-parameter.yaml", overlayLocation);
+        var getWidget = operations.stream()
+                .filter(op -> op.operationId().equals("getWidget"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(getWidget.inputSchema()).contains("The widget's numeric ID.");
+    }
+
+    @Test
     void overlayOverridesSummaryAndParameterDescription() {
         var operations = parser.parse("classpath:petstore.yaml", "classpath:overlay.yaml");
         var getPet = operations.stream()
