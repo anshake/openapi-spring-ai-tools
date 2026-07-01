@@ -154,7 +154,7 @@ arguments. Spend your time here first.
 
 ```xml
 <dependency>
-    <groupId>com.shake.openapi.ai</groupId>
+    <groupId>io.github.anshake</groupId>
     <artifactId>openapi-spring-ai-tools</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 </dependency>

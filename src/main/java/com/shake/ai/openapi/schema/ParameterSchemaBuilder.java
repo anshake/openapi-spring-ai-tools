@@ -1,4 +1,4 @@
-package com.shake.openapi.ai.schema;
+package com.shake.ai.openapi.schema;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

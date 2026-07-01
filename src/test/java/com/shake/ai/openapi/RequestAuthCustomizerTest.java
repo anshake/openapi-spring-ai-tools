@@ -1,4 +1,4 @@
-package com.shake.openapi.ai;
+package com.shake.ai.openapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;

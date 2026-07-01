@@ -1,4 +1,4 @@
-package com.shake.openapi.ai.model;
+package com.shake.ai.openapi.model;
 
 import org.springframework.http.HttpMethod;
 

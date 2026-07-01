@@ -1,9 +1,9 @@
-package com.shake.openapi.ai.http;
+package com.shake.ai.openapi.http;
 
-import com.shake.openapi.ai.RequestAuthCustomizer;
-import com.shake.openapi.ai.model.OpenApiOperation;
-import com.shake.openapi.ai.model.OpenApiParameter;
-import com.shake.openapi.ai.model.ParameterLocation;
+import com.shake.ai.openapi.RequestAuthCustomizer;
+import com.shake.ai.openapi.model.OpenApiOperation;
+import com.shake.ai.openapi.model.OpenApiParameter;
+import com.shake.ai.openapi.model.ParameterLocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;

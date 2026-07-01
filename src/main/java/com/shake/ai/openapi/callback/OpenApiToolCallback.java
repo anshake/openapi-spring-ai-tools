@@ -1,7 +1,7 @@
-package com.shake.openapi.ai.callback;
+package com.shake.ai.openapi.callback;
 
-import com.shake.openapi.ai.http.OperationExecutor;
-import com.shake.openapi.ai.model.OpenApiOperation;
+import com.shake.ai.openapi.http.OperationExecutor;
+import com.shake.ai.openapi.model.OpenApiOperation;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 

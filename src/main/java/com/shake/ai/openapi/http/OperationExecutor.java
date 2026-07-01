@@ -1,8 +1,8 @@
-package com.shake.openapi.ai.http;
+package com.shake.ai.openapi.http;
 
-import com.shake.openapi.ai.RequestAuthCustomizer;
-import com.shake.openapi.ai.model.OpenApiOperation;
-import com.shake.openapi.ai.model.ParameterLocation;
+import com.shake.ai.openapi.RequestAuthCustomizer;
+import com.shake.ai.openapi.model.OpenApiOperation;
+import com.shake.ai.openapi.model.ParameterLocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpMethod;
