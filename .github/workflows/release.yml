@@ -6,12 +6,21 @@ name: Release
 #   1. delete the tag if it was pushed:  git push --delete origin vX.Y.Z
 #   2. reset main back to before the "Release X" commit and force-push
 #   3. re-run this workflow
+#
+# When "publish" is enabled, the artifacts are also signed and pushed to Maven
+# Central after the GitHub Release is created. A Central publish cannot be
+# undone, so if it fails you can re-run this workflow with the same version to
+# retry (it is the last major step before the -SNAPSHOT bump).
 on:
   workflow_dispatch:
     inputs:
       version:
         description: 'Release version (e.g. 0.2.0)'
         required: true
+      publish:
+        description: 'Also publish to Maven Central'
+        type: boolean
+        default: false
 
 concurrency:
   group: release
@@ -74,6 +83,27 @@ jobs:
           name: v${{ env.RELEASE_VERSION }}
           files: target/openapi-spring-ai-tools-${{ env.RELEASE_VERSION }}.jar
           generate_release_notes: true
+
+      - name: Import GPG key
+        if: ${{ inputs.publish }}
+        run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+
+      - name: Configure Maven settings
+        if: ${{ inputs.publish }}
+        uses: s4u/maven-settings-action@v3.0.0
+        with:
+          servers: |
+            [{
+              "id": "central",
+              "username": "${{ secrets.CENTRAL_TOKEN_USERNAME }}",
+              "password": "${{ secrets.CENTRAL_TOKEN_PASSWORD }}"
+            }]
+
+      - name: Deploy to Maven Central
+        if: ${{ inputs.publish }}
+        run: mvn --batch-mode clean deploy
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Set next development version
         run: |
