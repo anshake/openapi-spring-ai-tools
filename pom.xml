@@ -5,7 +5,7 @@
 
     <groupId>io.github.anshake</groupId>
     <artifactId>openapi-spring-ai-tools</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <name>openapi-spring-ai-tools</name>
     <description>Expose OpenAPI 3 operations as Spring AI ToolCallbacks at runtime</description>
 
