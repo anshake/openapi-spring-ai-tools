@@ -114,6 +114,21 @@ class OpenApiSpecParserTest {
     }
 
     @Test
+    void overlayReferencingUnknownMethodThrows() {
+        var overlayLocation = writeOverlay("""
+                paths:
+                  /pet/{petId}:
+                    gett:
+                      summary: nope
+                """);
+
+        assertThatThrownBy(() -> parser.parse("classpath:petstore.yaml", overlayLocation))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("gett")
+                .hasMessageContaining("/pet/{petId}");
+    }
+
+    @Test
     void overlayReferencingUnknownPathThrows() {
         var overlayLocation = writeOverlay("""
                 paths:

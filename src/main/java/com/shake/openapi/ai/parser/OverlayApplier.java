@@ -68,7 +68,16 @@ class OverlayApplier
 
     private void applyOperation(PathItem pathItem, String pathTemplate, String methodName, JsonNode overlayOperation)
     {
-        var method = PathItem.HttpMethod.valueOf(methodName.toUpperCase());
+        PathItem.HttpMethod method;
+        try
+        {
+            method = PathItem.HttpMethod.valueOf(methodName.toUpperCase());
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new IllegalArgumentException(
+                    "Overlay references unknown HTTP method '" + methodName + "' on path " + pathTemplate);
+        }
         var operation = pathItem.readOperationsMap().get(method);
         if (operation == null)
         {
