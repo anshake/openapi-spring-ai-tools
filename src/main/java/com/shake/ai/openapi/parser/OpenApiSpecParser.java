@@ -1,10 +1,10 @@
-package com.shake.openapi.ai.parser;
+package com.shake.ai.openapi.parser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shake.openapi.ai.model.OpenApiOperation;
-import com.shake.openapi.ai.model.OpenApiParameter;
-import com.shake.openapi.ai.model.ParameterLocation;
-import com.shake.openapi.ai.schema.ParameterSchemaBuilder;
+import com.shake.ai.openapi.model.OpenApiOperation;
+import com.shake.ai.openapi.model.OpenApiParameter;
+import com.shake.ai.openapi.model.ParameterLocation;
+import com.shake.ai.openapi.schema.ParameterSchemaBuilder;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Json31;
 import io.swagger.v3.oas.models.OpenAPI;

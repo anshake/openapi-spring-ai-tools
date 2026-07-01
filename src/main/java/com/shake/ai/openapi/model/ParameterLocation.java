@@ -1,4 +1,4 @@
-package com.shake.openapi.ai.model;
+package com.shake.ai.openapi.model;
 
 /**
  * Where a parameter is carried in the HTTP request. Phase 1 supports only the

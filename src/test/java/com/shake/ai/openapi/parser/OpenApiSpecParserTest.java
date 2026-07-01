@@ -1,7 +1,7 @@
-package com.shake.openapi.ai.parser;
+package com.shake.ai.openapi.parser;
 
-import com.shake.openapi.ai.model.OpenApiOperation;
-import com.shake.openapi.ai.model.ParameterLocation;
+import com.shake.ai.openapi.model.OpenApiOperation;
+import com.shake.ai.openapi.model.ParameterLocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 

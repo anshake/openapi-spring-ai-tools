@@ -1,4 +1,4 @@
-package com.shake.openapi.ai.model;
+package com.shake.ai.openapi.model;
 
 /**
  * Routing metadata for one path or query parameter. Type information is not held

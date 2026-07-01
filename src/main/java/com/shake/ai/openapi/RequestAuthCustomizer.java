@@ -1,4 +1,4 @@
-package com.shake.openapi.ai;
+package com.shake.ai.openapi;
 
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.support.HttpRequestWrapper;
