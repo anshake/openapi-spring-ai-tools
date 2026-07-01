@@ -39,8 +39,12 @@ class OverlayApplier
     void apply(OpenAPI openAPI, String overlayLocation)
     {
         var overlay = readOverlay(overlayLocation);
-        var paths = overlay.path("paths");
-        paths.properties().forEach(pathEntry -> applyPath(openAPI, pathEntry.getKey(), pathEntry.getValue()));
+        if (!overlay.has("paths"))
+        {
+            throw new IllegalArgumentException("Overlay at " + overlayLocation + " is missing a top-level 'paths' field");
+        }
+        overlay.get("paths").properties()
+               .forEach(pathEntry -> applyPath(openAPI, pathEntry.getKey(), pathEntry.getValue()));
     }
 
     private void applyPath(OpenAPI openAPI, String pathTemplate, JsonNode methods)
