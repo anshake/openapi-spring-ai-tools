@@ -40,6 +40,8 @@ class OverlayApplier
     private static final String PARAMETERS = "parameters";
     private static final String NAME = "name";
     private static final String IN = "in";
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    private static final ObjectMapper YAML_MAPPER = new YAMLMapper();
 
     private final ResourceLoader resourceLoader = new DefaultResourceLoader();
 
@@ -153,7 +155,7 @@ class OverlayApplier
 
         try
         {
-            ObjectMapper mapper = isJson(contents) ? new ObjectMapper() : new YAMLMapper();
+            var mapper = isJson(contents) ? JSON_MAPPER : YAML_MAPPER;
             return mapper.readTree(contents);
         }
         catch (IOException e)
