@@ -76,6 +76,68 @@ class OperationExecutorTest {
     }
 
     @Test
+    void sendsRemainingFieldsAsJsonBodyForPut() {
+        server.expect(requestTo("http://localhost/pet"))
+                .andExpect(method(HttpMethod.PUT))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value("Rex"))
+                .andExpect(jsonPath("$.status").value("available"))
+                .andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "updatePet", "Update an existing pet", HttpMethod.PUT, "/pet", List.of(), "{}");
+
+        executor.execute(operation, "{\"name\":\"Rex\",\"status\":\"available\"}");
+
+        server.verify();
+    }
+
+    @Test
+    void omitsBodyWhenNoRemainingFieldsForPost() {
+        server.expect(requestTo("http://localhost/pet/42"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().string(""))
+                .andRespond(withSuccess("{\"id\":42}", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "updatePetViaForm", "Update pet via form", HttpMethod.POST, "/pet/{petId}",
+                List.of(new OpenApiParameter("petId", ParameterLocation.PATH, true)), "{}");
+
+        executor.execute(operation, "{\"petId\":42}");
+
+        server.verify();
+    }
+
+    @Test
+    void sendsUndeclaredFieldAsQueryParameterForGet() {
+        server.expect(requestTo("http://localhost/pet/findByStatus?status=available"))
+                .andExpect(method(GET))
+                .andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "findPetsByStatus", "Finds pets by status", GET, "/pet/findByStatus", List.of(), "{}");
+
+        executor.execute(operation, "{\"status\":\"available\"}");
+
+        server.verify();
+    }
+
+    @Test
+    void sendsUndeclaredFieldAsQueryParameterForDelete() {
+        server.expect(requestTo("http://localhost/pet/1?apiKey=secret"))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withSuccess("", MediaType.APPLICATION_JSON));
+
+        var operation = new OpenApiOperation(
+                "deletePet", "Deletes a pet", HttpMethod.DELETE, "/pet/{petId}",
+                List.of(new OpenApiParameter("petId", ParameterLocation.PATH, true)), "{}");
+
+        executor.execute(operation, "{\"petId\":1,\"apiKey\":\"secret\"}");
+
+        server.verify();
+    }
+
+    @Test
     void appendsApiKeyAsQueryParameter() {
         var authBuilder = RestClient.builder().baseUrl("http://localhost");
         var authServer = MockRestServiceServer.bindTo(authBuilder).build();

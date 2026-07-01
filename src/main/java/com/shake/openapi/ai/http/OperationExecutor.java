@@ -85,7 +85,7 @@ public class OperationExecutor
             routed.add(name);
         }
 
-        var body = json.createObjectNode();
+        var body = sendsBody ? json.createObjectNode() : null;
         input.propertyStream()
              .filter(entry -> !routed.contains(entry.getKey()))
              .forEach(entry -> {
