@@ -130,6 +130,11 @@ paths:
 Every path, method, and parameter the overlay references must exist in the target spec —
 a typo throws rather than being silently ignored.
 
+The model only ever sees one operation-level text field: `summary` if present, otherwise
+`description`. This is true with or without an overlay, so overlaying only `description` on
+an operation that already has a `summary` has no visible effect — override `summary`
+instead.
+
 ## Write Good Descriptions
 
 The model decides which tool to call. It decides from the descriptions in

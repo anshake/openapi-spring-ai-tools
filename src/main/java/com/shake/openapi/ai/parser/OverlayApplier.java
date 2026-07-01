@@ -24,6 +24,12 @@ import java.util.List;
  * <p>Every path, method, and parameter referenced by the overlay must exist in the
  * target spec — this is a maintenance signal for a drifted overlay, so a mismatch
  * throws rather than being silently ignored.
+ *
+ * <p>The model only ever sees one operation-level text field: {@code summary} if
+ * present, otherwise {@code description} (see {@code OpenApiSpecParser}). This
+ * precedence applies regardless of whether the value came from the spec or an
+ * overlay, so overlaying only {@code description} on an operation that already has
+ * a {@code summary} has no visible effect — override {@code summary} instead.
  */
 class OverlayApplier
 {
