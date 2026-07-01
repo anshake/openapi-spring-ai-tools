@@ -28,6 +28,7 @@ import java.util.List;
 class OverlayApplier
 {
 
+    private static final String PATHS = "paths";
     private static final String SUMMARY = "summary";
     private static final String DESCRIPTION = "description";
     private static final String PARAMETERS = "parameters";
@@ -39,11 +40,12 @@ class OverlayApplier
     void apply(OpenAPI openAPI, String overlayLocation)
     {
         var overlay = readOverlay(overlayLocation);
-        if (!overlay.has("paths"))
+        if (!overlay.has(PATHS))
         {
-            throw new IllegalArgumentException("Overlay at " + overlayLocation + " is missing a top-level 'paths' field");
+            throw new IllegalArgumentException(
+                    "Overlay at " + overlayLocation + " is missing a top-level '" + PATHS + "' field");
         }
-        overlay.get("paths").properties()
+        overlay.get(PATHS).properties()
                .forEach(pathEntry -> applyPath(openAPI, pathEntry.getKey(), pathEntry.getValue()));
     }
 
