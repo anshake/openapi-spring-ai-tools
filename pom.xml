@@ -9,6 +9,29 @@
     <name>openapi-spring-ai-tools</name>
     <description>Expose OpenAPI 3 operations as Spring AI ToolCallbacks at runtime</description>
 
+    <url>https://github.com/anshake/openapi-spring-ai-tools</url>
+
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>anshake</id>
+            <name>Shake</name>
+            <url>https://github.com/anshake</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/anshake/openapi-spring-ai-tools.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/anshake/openapi-spring-ai-tools.git</developerConnection>
+        <url>https://github.com/anshake/openapi-spring-ai-tools</url>
+    </scm>
+
     <properties>
         <java.version>25</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -17,7 +40,11 @@
         <spring-boot.version>4.1.0</spring-boot.version>
         <spring-ai.version>2.0.0</spring-ai.version>
         <swagger-parser.version>2.1.43</swagger-parser.version>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -73,7 +100,70 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+            </plugin>
+
+            <!-- Sources JAR — required by Maven Central -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Javadoc JAR — required by Maven Central -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- GPG signing — required by Maven Central -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Central Portal publisher -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${central-publishing-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                </configuration>
             </plugin>
         </plugins>
     </build>
