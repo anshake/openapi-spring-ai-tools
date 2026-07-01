@@ -23,7 +23,7 @@ three:
 
 | The model needs | Comes from the spec |
 | --- | --- |
-| A tool **name** | `operationId` |
+| A tool **name** | `operationId`, or a name generated from the method and path if omitted |
 | A **description** of when to use it | `summary` / `description`, optionally overridden by an [overlay](#overlay) |
 | A **JSON Schema** of parameters | path, query, and request-body parameters |
 
