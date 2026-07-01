@@ -59,7 +59,7 @@ public final class OpenApiToolBundle
      */
     public OpenApiToolBundle baseUrl(String baseUrl)
     {
-        this.baseUrl = baseUrl;
+        this.baseUrl = Objects.requireNonNull(baseUrl, "baseUrl must not be null");
         return this;
     }
 
