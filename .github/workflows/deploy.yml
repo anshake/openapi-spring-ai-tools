@@ -27,15 +27,6 @@ jobs:
       - name: Import GPG key
         run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
 
-      - name: Extract version from tag
-        id: version
-        run: |
-          TAG="${{ github.event.inputs.tag }}"
-          echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
-
-      - name: Set release version
-        run: mvn versions:set -DnewVersion=${{ steps.version.outputs.VERSION }} -DgenerateBackupPoms=false
-
       - name: Configure Maven settings
         uses: s4u/maven-settings-action@v3.0.0
         with:
