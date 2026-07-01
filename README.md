@@ -47,8 +47,25 @@ OpenAPI spec (classpath / file / URL)   overlay (classpath / file / URL), option
 
 ## Usage
 
-`OpenApiToolBundle` is the only type you touch. Point it at a spec, set the base URL, and
-call `build()`:
+**Requirements:** Java 17+, Spring AI 2.0.
+
+To get started, add the dependency to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>io.github.anshake</groupId>
+    <artifactId>openapi-spring-ai-tools</artifactId>
+    <version>0.4.1</version>
+</dependency>
+```
+
+Or with Gradle:
+
+```groovy
+implementation 'io.github.anshake:openapi-spring-ai-tools:0.4.1'
+```
+
+Everything runs through a single type, `OpenApiToolBundle`:
 
 ```java
 ToolCallbackProvider tools = OpenApiToolBundle
@@ -100,7 +117,7 @@ return it:
 
 ### Overlay
 
-Some specs — especially third-party ones — have poor or missing `summary`/`description`
+Some specs, especially third-party ones, have poor or missing `summary`/`description`
 fields, which makes the model pick the wrong tool or the wrong parameter. If you can't fix
 the spec at the source, layer an overlay on top of it with `.overlay(...)`:
 
@@ -147,28 +164,6 @@ the spec, so those descriptions are part of the prompt, not just documentation.
 
 Vague descriptions are the most common reason a model picks the wrong tool or sends bad
 arguments. Spend your time here first.
-
-## Getting Started
-
-**Requirements:** Java 17+, Spring AI 2.0.
-
-```xml
-<dependency>
-    <groupId>io.github.anshake</groupId>
-    <artifactId>openapi-spring-ai-tools</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
-</dependency>
-```
-
-## Scope (Phase 1)
-
-**Supported:** GET/POST/PUT/PATCH/DELETE operations; path, query, and JSON request bodies;
-specs loaded from classpath, file, or URL; authentication via `RequestAuthCustomizer`
-(bearer, API key header, API key query param, or custom); overlaying summary/description
-fields onto the spec via `.overlay(...)`.
-
-**Not yet supported:** Spring Boot autoconfiguration, operation filtering, and request
-bodies beyond `application/json`. HTTP errors are thrown as runtime exceptions.
 
 ## References
 
