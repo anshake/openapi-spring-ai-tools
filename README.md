@@ -24,23 +24,25 @@ three:
 | The model needs | Comes from the spec |
 | --- | --- |
 | A tool **name** | `operationId` |
-| A **description** of when to use it | `summary` / `description` |
+| A **description** of when to use it | `summary` / `description`, optionally overridden by an [overlay](#overlay) |
 | A **JSON Schema** of parameters | path, query, and request-body parameters |
 
 When the model calls a tool, `OperationExecutor` makes the HTTP request with `RestClient`
 and returns the response body to the model.
 
 ```
-OpenAPI spec (classpath / file / URL)
-        │
-        ▼
-List<OpenApiOperation>
-        │  ParameterSchemaBuilder  → JSON Schema per operation
-        ▼
-OpenApiToolCallback  (one ToolCallback per operation)
-        │
-        ▼
-ChatClient.defaultTools(provider)
+OpenAPI spec (classpath / file / URL)   overlay (classpath / file / URL), optional
+        │                                       │
+        └───────────────────┬───────────────────┘
+                             │  OverlayApplier  → overrides summary/description in place
+                             ▼
+                    List<OpenApiOperation>
+                             │  ParameterSchemaBuilder  → JSON Schema per operation
+                             ▼
+                    OpenApiToolCallback  (one ToolCallback per operation)
+                             │
+                             ▼
+                    ChatClient.defaultTools(provider)
 ```
 
 ## Usage
