@@ -1,0 +1,9 @@
+paths:
+  /pet/{petId}:
+    get:
+      summary: Fetch a single pet record by its numeric identifier
+      description: Use this to look up one pet, not to search across pets.
+      parameters:
+        - name: petId
+          in: path
+          description: The pet's numeric ID, not its name.

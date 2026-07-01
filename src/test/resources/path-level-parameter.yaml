@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Path-level parameter fixture
+  version: 1.0.0
+paths:
+  /widgets/{widgetId}:
+    parameters:
+      - name: widgetId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      operationId: getWidget
+      summary: Get a widget by ID
+      responses:
+        '200':
+          description: ok
