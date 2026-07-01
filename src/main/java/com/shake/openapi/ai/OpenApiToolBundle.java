@@ -25,6 +25,7 @@ public final class OpenApiToolBundle
 {
 
     private final String specLocation;
+    private String overlayLocation;
     private String baseUrl;
     private RequestAuthCustomizer auth;
 
@@ -40,6 +41,17 @@ public final class OpenApiToolBundle
     public static OpenApiToolBundle from(String specLocation)
     {
         return new OpenApiToolBundle(specLocation);
+    }
+
+    /**
+     * An overlay document (same resource location semantics as {@link #from}) whose
+     * endpoint and parameter {@code summary}/{@code description} fields override the
+     * spec's. Optional.
+     */
+    public OpenApiToolBundle overlay(String overlayLocation)
+    {
+        this.overlayLocation = overlayLocation;
+        return this;
     }
 
     /**
@@ -62,7 +74,7 @@ public final class OpenApiToolBundle
 
     public ToolCallbackProvider build()
     {
-        var operations = new OpenApiSpecParser().parse(specLocation);
+        var operations = new OpenApiSpecParser().parse(specLocation, overlayLocation);
         var executor = new OperationExecutor(baseUrl, auth);
         var callbacks = operations.stream()
                                   .map(operation -> new OpenApiToolCallback(operation, executor))

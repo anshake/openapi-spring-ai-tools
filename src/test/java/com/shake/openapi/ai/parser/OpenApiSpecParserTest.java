@@ -5,7 +5,13 @@ import com.shake.openapi.ai.model.ParameterLocation;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class OpenApiSpecParserTest {
 
@@ -67,6 +73,71 @@ class OpenApiSpecParserTest {
                 .contains("\"status\"")
                 .contains("\"required\":[\"name\"]")
                 .doesNotContain("\"body\"");
+    }
+
+    @Test
+    void overlayOverridesSummaryAndParameterDescription() {
+        var operations = parser.parse("classpath:petstore.yaml", "classpath:overlay.yaml");
+        var getPet = operations.stream()
+                .filter(op -> op.operationId().equals("getPetById"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(getPet.summary()).isEqualTo("Fetch a single pet record by its numeric identifier");
+        assertThat(getPet.inputSchema()).contains("The pet's numeric ID, not its name.");
+    }
+
+    @Test
+    void overlayLeavesOtherOperationsUntouched() {
+        var operations = parser.parse("classpath:petstore.yaml", "classpath:overlay.yaml");
+        var addPet = operations.stream()
+                .filter(op -> op.operationId().equals("addPet"))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(addPet.summary()).isEqualTo("Add a new pet");
+    }
+
+    @Test
+    void overlayReferencingUnknownPathThrows() {
+        var overlayLocation = writeOverlay("""
+                paths:
+                  /pet/unknown:
+                    get:
+                      summary: nope
+                """);
+
+        assertThatThrownBy(() -> parser.parse("classpath:petstore.yaml", overlayLocation))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("/pet/unknown");
+    }
+
+    @Test
+    void overlayReferencingUnknownParameterThrows() {
+        var overlayLocation = writeOverlay("""
+                paths:
+                  /pet/{petId}:
+                    get:
+                      parameters:
+                        - name: doesNotExist
+                          in: query
+                          description: nope
+                """);
+
+        assertThatThrownBy(() -> parser.parse("classpath:petstore.yaml", overlayLocation))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("doesNotExist");
+    }
+
+    private String writeOverlay(String contents) {
+        try {
+            var file = File.createTempFile("overlay", ".yaml");
+            file.deleteOnExit();
+            Files.writeString(file.toPath(), contents);
+            return "file:" + file.getAbsolutePath();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     private OpenApiOperation operation(String operationId) {

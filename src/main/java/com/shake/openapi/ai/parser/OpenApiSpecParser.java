@@ -44,7 +44,16 @@ public class OpenApiSpecParser
 
     public List<OpenApiOperation> parse(String specLocation)
     {
+        return parse(specLocation, null);
+    }
+
+    public List<OpenApiOperation> parse(String specLocation, String overlayLocation)
+    {
         var openAPI = readSpec(specLocation);
+        if (overlayLocation != null)
+        {
+            new OverlayApplier().apply(openAPI, overlayLocation);
+        }
         if (openAPI.getPaths() == null)
         {
             return List.of();
