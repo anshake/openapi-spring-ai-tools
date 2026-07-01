@@ -37,12 +37,12 @@ class OpenApiSpecParserTest {
 
     @Test
     void capturesPathAndQueryParameterRouting() {
-        var petId = operation("getPetById").parameters().getFirst();
+        var petId = operation("getPetById").parameters().get(0);
         assertThat(petId.name()).isEqualTo("petId");
         assertThat(petId.in()).isEqualTo(ParameterLocation.PATH);
         assertThat(petId.required()).isTrue();
 
-        var status = operation("findPetsByStatus").parameters().getFirst();
+        var status = operation("findPetsByStatus").parameters().get(0);
         assertThat(status.name()).isEqualTo("status");
         assertThat(status.in()).isEqualTo(ParameterLocation.QUERY);
         assertThat(status.required()).isFalse();
@@ -83,7 +83,7 @@ class OpenApiSpecParserTest {
                 .findFirst()
                 .orElseThrow();
 
-        var widgetId = getWidget.parameters().getFirst();
+        var widgetId = getWidget.parameters().get(0);
         assertThat(widgetId.name()).isEqualTo("widgetId");
         assertThat(widgetId.in()).isEqualTo(ParameterLocation.PATH);
         assertThat(widgetId.required()).isTrue();

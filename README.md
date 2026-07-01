@@ -150,7 +150,7 @@ arguments. Spend your time here first.
 
 ## Getting Started
 
-**Requirements:** Java 25, Spring AI 2.0.
+**Requirements:** Java 17+, Spring AI 2.0.
 
 ```xml
 <dependency>
