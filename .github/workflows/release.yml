@@ -8,9 +8,14 @@ name: Release
 #   3. re-run this workflow
 #
 # When "publish" is enabled, the artifacts are also signed and pushed to Maven
-# Central after the GitHub Release is created. A Central publish cannot be
-# undone, so if it fails you can re-run this workflow with the same version to
-# retry (it is the last major step before the -SNAPSHOT bump).
+# Central after the GitHub Release is created (the last major step before the
+# -SNAPSHOT bump). A Central publish cannot be undone. Because the release
+# commit and tag are already pushed by this point, a failed publish cannot be
+# retried by naively re-running the workflow (it would fail at "Commit and tag
+# release" since the tag already exists) — first follow the recovery steps
+# above to delete the tag and reset main, then re-run. Note that if the upload
+# actually reached Central and published, re-running will be rejected as a
+# duplicate; recovery only helps when publishing failed before that point.
 on:
   workflow_dispatch:
     inputs:
